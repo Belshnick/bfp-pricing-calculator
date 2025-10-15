@@ -264,11 +264,20 @@ function recalc(){
   const grand = Object.values(tot).reduce((a,b)=>a+b,0);
   $('grand').textContent = fmt(grand);
 
-  const remaining = budget - grand;
+const remaining = budget - grand;
+
+if (key === 'std') {
+  // If Standard tier (<50k), hide the number and status text
+  $('remaining').textContent = '—';
+  $('statusText').textContent = '';
+  $('remaining').classList.remove('green', 'red');
+} else {
+  // For retainer tiers, show remaining budget as before
   $('remaining').textContent = fmt(Math.abs(remaining));
-  $('remaining').classList.toggle('green', remaining>=0);
-  $('remaining').classList.toggle('red', remaining<0);
-  $('statusText').textContent = remaining>=0 ? 'Under budget' : 'Over budget';
+  $('remaining').classList.toggle('green', remaining >= 0);
+  $('remaining').classList.toggle('red', remaining < 0);
+  $('statusText').textContent = remaining >= 0 ? 'Under budget' : 'Over budget';
+}
 
   $('tierLabel').textContent = t.label;
   $('perkNote').textContent  = `Included event days: ${t.freeEvents}`;
