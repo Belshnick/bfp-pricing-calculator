@@ -1,9 +1,252 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>BFP Pricing Calculator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Big Fridge – Video Pricing Calculator</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --card:#141416; --line:#222229;
+    --text:#f5f5f6; --muted:#a9a9b2; --brand:#f7a400;
+    --ok:#1ec38b; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:16px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:36px auto;padding:0 20px}
+  h1{margin:0 0 6px;font-size:28px}
+  p.sub{margin:0 0 20px;color:var(--muted)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+  .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-weight:600;margin-bottom:6px}
+  input[type="number"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#0e0e11;color:var(--text)}
+  .btn{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#121214;color:var(--text);cursor:pointer}
+  .btn.active{background:#1d1d22}
+  .tierSel{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .row{display:grid;grid-template-columns:2.2fr .9fr .7fr .9fr 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .row.head{font-weight:700}
+  .muted{color:var(--muted)}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .totals{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+  .kpi{flex:1;min-width:230px;background:#101013;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .kpi .val{font-size:22px;font-weight:800}
+  .green{color:var(--ok)} .red{color:var(--bad)}
+  .note{color:var(--muted);font-size:13px;margin-top:6px}
+  .foot{color:var(--muted);font-size:13px;margin-top:12px}
+</style>
 </head>
 <body>
-  <h1>Pricing Calculator Coming Soon</h1>
+  <div class="wrap">
+    <h1>Video Pricing Calculator</h1>
+    <p class="sub">Enter your annual budget. We’ll apply the correct discount tier and included event days automatically.</p>
+
+    <div class="panel grid">
+      <div>
+        <label>Committed Budget (USD)</label>
+        <input id="budget" type="number" min="0" step="1000" value="80000" />
+        <div class="note">Tiers: Standard (&lt;$50k), $50k (10% + 1 event day), $100k (20% + 2 days), $150k+ (30% + 3 days).</div>
+      </div>
+      <div>
+        <label>Tier (auto from budget) — click to preview</label>
+        <div id="tierBtns" class="tierSel"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="summary" class="note" style="margin-bottom:6px"></div>
+      <div class="row head">
+        <div>Package</div>
+        <div class="muted">Unit Price</div>
+        <div class="muted">Qty</div>
+        <div class="muted">Line Total</div>
+        <div class="muted">Notes</div>
+      </div>
+
+      <div class="row">
+        <div>1-Day Filming – Case study or product (2–3 mins)</div>
+        <div id="p_filming"></div>
+        <div><input id="q_filming" type="number" min="0" step="1" value="1"></div>
+        <div id="t_filming"></div>
+        <div class="muted">per video</div>
+      </div>
+
+      <div class="row">
+        <div>Advanced Filming – Brand/Hero (1–2 days, ~2 mins/day)</div>
+        <div id="p_advday"></div>
+        <div><input id="q_advday" type="number" min="0" step="1" value="1"></div>
+        <div id="t_advday"></div>
+        <div class="muted">per shoot day</div>
+      </div>
+
+      <div class="row">
+        <div>Drone+Videographer (1–2 mins)</div>
+        <div id="p_drone"></div>
+        <div><input id="q_drone" type="number" min="0" step="1" value="1"></div>
+        <div id="t_drone"></div>
+        <div class="muted">per video</div>
+      </div>
+
+      <div class="row">
+        <div>Single Videographer – installations / training / how-to (1–2 mins)</div>
+        <div id="p_single"></div>
+        <div><input id="q_single" type="number" min="0" step="1" value="1"></div>
+        <div id="t_single"></div>
+        <div class="muted">per video</div>
+      </div>
+
+      <div class="row">
+        <div>Event Coverage (filming + editing)</div>
+        <div id="p_event"></div>
+        <div><input id="q_event" type="number" min="0" step="1" value="3"></div>
+        <div id="t_event"></div>
+        <div class="muted" id="eventNote"></div>
+      </div>
+
+      <div class="row">
+        <div>Basic 3D Animation (1–2 mins)</div>
+        <div id="p_anim_basic"></div>
+        <div><input id="q_anim_basic" type="number" min="0" step="1" value="1"></div>
+        <div id="t_anim_basic"></div>
+        <div class="muted">per video</div>
+      </div>
+
+      <div class="row">
+        <div>Advanced 3D Animation (1–2 mins)</div>
+        <div id="p_anim_adv"></div>
+        <div><input id="q_anim_adv" type="number" min="0" step="1" value="1"></div>
+        <div id="t_anim_adv"></div>
+        <div class="muted">per video</div>
+      </div>
+
+      <div class="totals">
+        <div class="kpi">
+          <div class="muted">Tier</div>
+          <div class="val" id="tierLabel">—</div>
+          <div class="note" id="perkNote">—</div>
+        </div>
+        <div class="kpi">
+          <div class="muted">Total</div>
+          <div class="val" id="grand">$0</div>
+        </div>
+        <div class="kpi">
+          <div class="muted">Remaining Budget</div>
+          <div class="val" id="remaining">$0</div>
+          <div class="note" id="statusText"></div>
+        </div>
+      </div>
+
+      <div class="foot">Short-form cutdowns and social variations are included free with every deliverable.</div>
+    </div>
+  </div>
+
+<script>
+/* === Rates (must match your sheet) === */
+const rates = {
+  filming:     { std:9000,  k50:8100,  k100:7200,  k150:6300,  unit:'video' },
+  adv_day:     { std:12000, k50:10800, k100:9600,  k150:8400,  unit:'day'   },
+  drone:       { std:4000,  k50:3600,  k100:3200,  k150:2800,  unit:'video' },
+  single:      { std:3000,  k50:2700,  k100:2400,  k150:2100,  unit:'video' },
+  event_day:   { std:3000,  k50:2700,  k100:2400,  k150:2100,  unit:'day'   },
+  anim_basic:  { std:7000,  k50:6300,  k100:5600,  k150:4900,  unit:'video' },
+  anim_adv:    { std:12000, k50:10800, k100:9600,  k150:8400,  unit:'video' },
+};
+/* Tiers & perks (free event days 1/2/3) */
+const tiers = [
+  { key:'std',  label:'Standard',                   min:0,      freeEvents:0 },
+  { key:'k50',  label:'$50k Retainer (10% off)',    min:50000,  freeEvents:1 },
+  { key:'k100', label:'$100k Retainer (20% off)',   min:100000, freeEvents:2 },
+  { key:'k150', label:'$150k+ Retainer (30% off)',  min:150000, freeEvents:3 },
+];
+
+/* DOM helpers */
+const $ = id => document.getElementById(id);
+const fmt = n => `$${(Math.round(n)).toLocaleString()}`;
+
+/* Build tier buttons */
+const btnWrap = $('tierBtns');
+tiers.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='btn'; b.textContent=t.label;
+  b.onclick=()=>{ $('budget').value=t.min; recalc(); };
+  btnWrap.appendChild(b);
+});
+
+/* Inputs map */
+const qtyIds = {
+  filming:'q_filming', adv_day:'q_advday', drone:'q_drone', single:'q_single',
+  event_day:'q_event', anim_basic:'q_anim_basic', anim_adv:'q_anim_adv'
+};
+Object.values(qtyIds).forEach(id => $(id).addEventListener('input', recalc));
+$('budget').addEventListener('input', recalc);
+
+function tierFromBudget(b){
+  if(b>=150000) return tiers[3];
+  if(b>=100000) return tiers[2];
+  if(b>=50000)  return tiers[1];
+  return tiers[0];
+}
+
+function recalc(){
+  const budget = Number($('budget').value||0);
+  const t = tierFromBudget(budget);
+
+  // Activate button state
+  [...btnWrap.children].forEach((b,i)=> b.classList.toggle('active', tiers[i]===t));
+
+  // Prices for visible tier
+  const key = t.key;
+  $('p_filming').textContent     = fmt(rates.filming[key]);
+  $('p_advday').textContent      = fmt(rates.adv_day[key]) + '/day';
+  $('p_drone').textContent       = fmt(rates.drone[key]);
+  $('p_single').textContent      = fmt(rates.single[key]);
+  $('p_event').textContent       = fmt(rates.event_day[key]) + '/day';
+  $('p_anim_basic').textContent  = fmt(rates.anim_basic[key]);
+  $('p_anim_adv').textContent    = fmt(rates.anim_adv[key]);
+
+  // Quantities
+  const q = {};
+  for (const k in qtyIds) q[k] = Number($(qtyIds[k]).value||0);
+
+  // Line totals
+  const tot = {};
+  tot.filming    = q.filming    * rates.filming[key];
+  tot.adv_day    = q.adv_day    * rates.adv_day[key];
+  tot.drone      = q.drone      * rates.drone[key];
+  tot.single     = q.single     * rates.single[key];
+  const billableEventDays = Math.max(0, q.event_day - t.freeEvents);
+  tot.event_day  = billableEventDays * rates.event_day[key];
+  tot.anim_basic = q.anim_basic * rates.anim_basic[key];
+  tot.anim_adv   = q.anim_adv   * rates.anim_adv[key];
+
+  // Write line totals
+  $('t_filming').textContent    = fmt(tot.filming);
+  $('t_advday').textContent     = fmt(tot.adv_day);
+  $('t_drone').textContent      = fmt(tot.drone);
+  $('t_single').textContent     = fmt(tot.single);
+  $('t_event').textContent      = fmt(tot.event_day);
+  $('t_anim_basic').textContent = fmt(tot.anim_basic);
+  $('t_anim_adv').textContent   = fmt(tot.anim_adv);
+
+  $('eventNote').textContent = `Free days: ${t.freeEvents} • Billed: ${billableEventDays}`;
+
+  // Totals + summary
+  const grand = Object.values(tot).reduce((a,b)=>a+b,0);
+  $('grand').textContent = fmt(grand);
+
+  const remaining = budget - grand;
+  $('remaining').textContent = fmt(Math.abs(remaining));
+  $('remaining').classList.toggle('green', remaining>=0);
+  $('remaining').classList.toggle('red', remaining<0);
+  $('statusText').textContent = remaining>=0 ? 'Under budget' : 'Over budget';
+
+  $('tierLabel').textContent = t.label;
+  $('perkNote').textContent  = `Included event days: ${t.freeEvents}`;
+  $('summary').textContent   =
+    `Tier: ${t.label} • Included Event Days: ${t.freeEvents} • ` +
+    `Total: ${fmt(grand)} • Remaining Budget: ${fmt(remaining)}`;
+}
+recalc();
+</script>
 </body>
 </html>
