@@ -141,16 +141,21 @@
   </div>
 
 <script>
-/* === Rates (must match your sheet) === */
+
+/* === Rates (updated) === */
 const rates = {
-  filming:     { std:9000,  k50:8100,  k100:7200,  k150:6300,  unit:'video' },
-  adv_day:     { std:12000, k50:10800, k100:9600,  k150:8400,  unit:'day'   },
-  drone:       { std:4000,  k50:3600,  k100:3200,  k150:2800,  unit:'video' },
-  single:      { std:3000,  k50:2700,  k100:2400,  k150:2100,  unit:'video' },
-  event_day:   { std:3000,  k50:2700,  k100:2400,  k150:2100,  unit:'day'   },
-  anim_basic:  { std:7000,  k50:6300,  k100:5600,  k150:4900,  unit:'video' },
-  anim_adv:    { std:12000, k50:10800, k100:9600,  k150:8400,  unit:'video' },
+  // per video
+  filming:     { std:  9000, k50:  8100, k100:  7200, k150:  6300, unit: 'video' },
+  drone:       { std:  6500, k50:  5850, k100:  5200, k150:  4550, unit: 'video' },
+  single:      { std:  4000, k50:  3600, k100:  3200, k150:  2800, unit: 'video' },
+  anim_basic:  { std:  9000, k50:  8100, k100:  7200, k150:  6300, unit: 'video' },
+  anim_adv:    { std: 18000, k50: 16200, k100: 14400, k150: 12600, unit: 'video' },
+
+  // per shoot day
+  adv_day:     { std: 15000, k50: 13500, k100: 12000, k150: 10500, unit: 'day'   },
+  event_day:   { std:  2000, k50:  1800, k100:  1600, k150:  1400, unit: 'day'   },
 };
+  
 /* Tiers & perks (free event days 1/2/3) */
 const tiers = [
   { key:'std',  label:'Standard',                   min:0,      freeEvents:0 },
