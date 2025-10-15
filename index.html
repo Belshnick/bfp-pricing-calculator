@@ -163,14 +163,39 @@ const tiers = [
 const $ = id => document.getElementById(id);
 const fmt = n => `$${(Math.round(n)).toLocaleString()}`;
 
-/* Build tier buttons */
+/* Build tier buttons with preset quantities */
 const btnWrap = $('tierBtns');
 tiers.forEach(t=>{
-  const b=document.createElement('button');
-  b.className='btn'; b.textContent=t.label;
-  b.onclick=()=>{ $('budget').value=t.min; recalc(); };
+  const b = document.createElement('button');
+  b.className = 'btn';
+  b.textContent = t.label;
+
+  b.onclick = () => {
+    $('budget').value = t.min;
+
+    // Set preset quantities for each tier
+    const presets = {
+      std:  { filming: 0, adv_day: 0, drone: 0, single: 0, anim_basic: 0, event_day: 0, anim_adv: 0 },
+      k50:  { filming: 4, adv_day: 1, drone: 1, single: 1, anim_basic: 1, event_day: 0, anim_adv: 0 },
+      k100: { filming: 8, adv_day: 2, drone: 4, single: 4, anim_basic: 2, event_day: 0, anim_adv: 0 },
+      k150: { filming: 10, adv_day: 2, drone: 7, single: 7, anim_basic: 4, event_day: 2, anim_adv: 0 },
+    };
+
+    const q = presets[t.key];
+    $('q_filming').value     = q.filming;
+    $('q_advday').value      = q.adv_day;
+    $('q_drone').value       = q.drone;
+    $('q_single').value      = q.single;
+    $('q_anim_basic').value  = q.anim_basic;
+    $('q_event').value       = q.event_day;
+    $('q_anim_adv').value    = q.anim_adv;
+
+    recalc();
+  };
+
   btnWrap.appendChild(b);
 });
+
 
 /* Inputs map */
 const qtyIds = {
